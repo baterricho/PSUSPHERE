@@ -19,6 +19,9 @@
               <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-danger btn-block mb-3">
                 Continue with Google
               </a>
+              <a href="{% provider_login_url 'github' process='login' %}" class="btn btn-dark btn-block mb-3">
+                Continue with GitHub
+              </a>
               <form method="post" action="{% url 'account_login' %}">
                 {% csrf_token %}
                 {% if redirect_field_value %}
@@ -47,6 +50,9 @@
             </div>
             <div class="col-md-6 mb-4">
               <h5>Sign Up</h5>
+              <a href="{% provider_login_url 'github' process='login' %}" class="btn btn-dark btn-block mb-3">
+                Sign up with GitHub
+              </a>
               <form method="post" action="{% url 'account_signup' %}">
                 {% csrf_token %}
                 <div class="form-group">

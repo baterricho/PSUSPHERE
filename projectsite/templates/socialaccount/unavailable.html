@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Social Login Unavailable | PSUSphere{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-header">
+          <div class="card-title">{{ provider|default:"Social" }} Login Unavailable</div>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            This login provider is not configured yet. Add the OAuth client ID and secret, then reload the web app.
+          </p>
+          <a href="{% url 'account_login' %}" class="btn btn-primary">Back to Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

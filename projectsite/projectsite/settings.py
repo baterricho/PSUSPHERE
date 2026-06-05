@@ -23,9 +23,21 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        "http://127.0.0.1,http://localhost,https://baterricho.pythonanywhere.com",
+    ).split(",")
+    if origin.strip()
+]
+
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
 USE_SETTINGS_GOOGLE_APP = os.environ.get("USE_SETTINGS_GOOGLE_APP", "False") == "True"
+GITHUB_OAUTH_CLIENT_ID = os.environ.get("GITHUB_OAUTH_CLIENT_ID", "")
+GITHUB_OAUTH_CLIENT_SECRET = os.environ.get("GITHUB_OAUTH_CLIENT_SECRET", "")
+USE_SETTINGS_GITHUB_APP = os.environ.get("USE_SETTINGS_GITHUB_APP", "False") == "True"
 
 
 def module_available(module_name):
@@ -62,6 +74,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "studentorg",
+    "pwa",
 ]
 
 if WIDGET_TWEAKS_ENABLED:
@@ -120,7 +133,7 @@ WSGI_APPLICATION = "projectsite.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.environ.get("SQLITE_NAME", BASE_DIR / "db.sqlite3"),
     }
 }
 
@@ -183,11 +196,15 @@ if ALLAUTH_ENABLED:
     ACCOUNT_LOGOUT_REDIRECT_URL = "/"
     ACCOUNT_LOGIN_METHODS = {"username", "email"}
     ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
+    SOCIALACCOUNT_LOGIN_ON_GET = True
 
     SOCIALACCOUNT_PROVIDERS = {
         "google": {
             "SCOPE": ["profile", "email"],
             "AUTH_PARAMS": {"access_type": "online"},
+        },
+        "github": {
+            "SCOPE": ["user:email"],
         }
     }
 
@@ -198,4 +215,44 @@ if ALLAUTH_ENABLED:
             "key": "",
         }
 
+    if USE_SETTINGS_GITHUB_APP and GITHUB_OAUTH_CLIENT_ID and GITHUB_OAUTH_CLIENT_SECRET:
+        SOCIALACCOUNT_PROVIDERS["github"]["APP"] = {
+            "client_id": GITHUB_OAUTH_CLIENT_ID,
+            "secret": GITHUB_OAUTH_CLIENT_SECRET,
+            "key": "",
+        }
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# --- Progressive Web App Settings ---
+PWA_APP_NAME = 'ProjectSite'
+PWA_APP_DESCRIPTION = "A Progressive Web App version of ProjectSite"
+PWA_APP_THEME_COLOR = '#0A0A0A'
+PWA_APP_BACKGROUND_COLOR = '#FFFFFF'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'portrait'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/img/icon-192.png',
+        'sizes': '192x192'
+    },
+    {
+        'src': '/static/img/icon-512.png',
+        'sizes': '512x512'
+    }
+]
+PWA_APP_ICONS_APPLE = [
+    {
+        'src': '/static/img/icon-192.png',
+        'sizes': '192x192'
+    },
+    {
+        'src': '/static/img/icon-512.png',
+        'sizes': '512x512'
+    }
+]
+PWA_APP_DIR = 'ltr'
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
