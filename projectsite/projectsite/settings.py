@@ -197,6 +197,9 @@ if ALLAUTH_ENABLED:
     ACCOUNT_LOGIN_METHODS = {"username", "email"}
     ACCOUNT_SIGNUP_FIELDS = ["username*", "email*", "password1*", "password2*"]
     SOCIALACCOUNT_LOGIN_ON_GET = True
+    SOCIALACCOUNT_FORMS = {
+        "signup": "studentorg.social_forms.AutoSocialSignupForm",
+    }
 
     SOCIALACCOUNT_PROVIDERS = {
         "google": {
