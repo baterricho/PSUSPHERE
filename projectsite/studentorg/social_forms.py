@@ -1,32 +1,29 @@
 import re
 
 from allauth.socialaccount.forms import SignupForm
-from django import forms
 from django.contrib.auth import get_user_model
 
 
 class AutoSocialSignupForm(SignupForm):
-    """Hide social signup fields while still passing valid account data to allauth."""
+    """Continue social signup without asking for username or email again."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields.clear()
 
-        email = self.initial.get("email") or getattr(self.sociallogin.user, "email", "")
-        username = self.initial.get("username") or getattr(self.sociallogin.user, "username", "")
+    def save(self, request):
+        user = self.sociallogin.user
+        email = getattr(user, "email", "") or self.initial.get("email", "")
 
-        if not username:
-            username = self._make_unique_username(email)
+        if email and not user.email:
+            user.email = email
 
-        self.initial["email"] = email
-        self.initial["username"] = username
+        if not user.username:
+            user.username = self._make_unique_username(email)
 
-        if "email" in self.fields:
-            self.fields["email"].initial = email
-            self.fields["email"].widget = forms.HiddenInput()
-
-        if "username" in self.fields:
-            self.fields["username"].initial = username
-            self.fields["username"].widget = forms.HiddenInput()
+        user.set_unusable_password()
+        self.sociallogin.save(request)
+        return user
 
     def _make_unique_username(self, email):
         User = get_user_model()
