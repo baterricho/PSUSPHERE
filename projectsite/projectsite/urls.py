@@ -63,18 +63,28 @@ if settings.ALLAUTH_ENABLED:
         except Exception:
             return redirect("/accounts/login/")
 
-    urlpatterns.insert(1, path("accounts/google/login/", google_login_entry))
-    urlpatterns.insert(1, path("accounts/google/login/callback/", google_callback_entry))
-    urlpatterns.insert(1, path("accounts/github/login/", github_login_entry))
-    urlpatterns.insert(1, path("accounts/github/login/callback/", github_callback_entry))
-    urlpatterns.insert(3, path("accounts/3rdparty/signup/", social_signup_entry))
-    urlpatterns.insert(4, path("accounts/", include("allauth.urls")))
+    urlpatterns = [
+        path("admin/", admin.site.urls),
+        path("accounts/google/login/", google_login_entry),
+        path("accounts/google/login/callback/", google_callback_entry),
+        path("accounts/github/login/", github_login_entry),
+        path("accounts/github/login/callback/", github_callback_entry),
+        path("accounts/3rdparty/signup/", social_signup_entry),
+        path("accounts/", include("allauth.urls")),
+        path("", include("studentorg.urls")),
+        path("", include("pwa.urls")),
+    ]
 else:
     def social_unavailable(request):
         return render(request, "socialaccount/unavailable.html", status=503)
 
-    urlpatterns.insert(1, path("accounts/google/login/callback/", social_unavailable))
-    urlpatterns.insert(2, path("accounts/google/login/", social_unavailable))
-    urlpatterns.insert(3, path("accounts/github/login/callback/", social_unavailable))
-    urlpatterns.insert(4, path("accounts/github/login/", social_unavailable))
-    urlpatterns.insert(5, path("accounts/login/", social_unavailable))
+    urlpatterns = [
+        path("admin/", admin.site.urls),
+        path("accounts/google/login/callback/", social_unavailable),
+        path("accounts/google/login/", social_unavailable),
+        path("accounts/github/login/callback/", social_unavailable),
+        path("accounts/github/login/", social_unavailable),
+        path("accounts/login/", social_unavailable),
+        path("", include("studentorg.urls")),
+        path("", include("pwa.urls")),
+    ]
